@@ -16,30 +16,26 @@ namespace ConsoleApp1
             int b = 0;
             var chips = new List<int>();
             int temp;
-            string strtemp;
+            string strchips;
 
-            Console.WriteLine("Для начала работы вводите количество фишек на месте по одному, без знаков препинания и пробелов, нажимая Enter после каждого, после нажмите Enter еще раз" + '\n');
+            Console.WriteLine("Для начала работы введите количество фишек на каждом месте через запятую, после нажмите Enter" + '\n');
 
+            strchips = Console.ReadLine();
+            strchips = strchips.Trim(' ');
             while (a == 0)
             {
-                strtemp = Console.ReadLine();
-                if (strtemp != "")
+                if (strchips.Contains(",") != false)
                 {
-                    try
-                    {
-                        chips.Add(Convert.ToInt32(strtemp));
-                    }
-                    catch(System.FormatException)
-                    {
-                        Console.WriteLine("Пожалуйста, вводите элементы по одному без знаков препинания и пробелов");
-                    }
+                    temp = strchips.IndexOf(",");
+                    chips.Add(Convert.ToInt32(strchips.Remove(temp)));
+                    strchips = strchips.Remove(0, temp + 1);
                 }
                 else
                 {
-                    a = 1;
+                    chips.Add(Convert.ToInt32(strchips));
+                    break;
                 }
             }
-            a = 0;
 
             foreach (int i in chips)
             {
@@ -50,86 +46,85 @@ namespace ConsoleApp1
 
             int ready, steps;
             steps = 0;
-            while (a == 0) 
+            while (a == 0)
             {
-                for (int i = 0; i < chips.Count; i++)
+                int min = chips[0];
+                int indexmin = 0;
+                for (int i = 1; i < chips.Count; i++)
                 {
-                    if (chips[i] < equilibrium)
+                    if (min > chips[i])
                     {
-                        temp = 1;
-                        while (b == 0)
+                        min = chips[i];
+                        indexmin = i;
+                    }
+                }
+                temp = 1;
+                while (b == 0)
+                {
+                    try
+                    {
+                        if (chips[indexmin + temp] > equilibrium)
                         {
-                            try
-                            {
-                                if (chips[i + temp] > equilibrium)
-                                {
-                                    chips[i + temp] -= 1;
-                                    chips[i] += 1;
-                                    steps += temp;
-                                    i = 0;
-                                    break;
-                                }
-                            }
-                            catch (System.ArgumentOutOfRangeException)
-                            {
-                                if (chips[i + temp - chips.Count] > equilibrium)
-                                {
-                                    chips[i + temp - chips.Count] -= 1;
-                                    chips[i] += 1;
-                                    steps += temp;
-                                    i = 0;
-                                    break;
-                                }
-                            }
-                            try
-                            {
-                                if (chips[i - temp] > equilibrium)
-                                {
-                                    chips[i - temp] -= 1;
-                                    chips[i] += 1;
-                                    steps += temp;
-                                    i = 0;
-                                    break;
-                                }
-                            }
-                            catch (System.ArgumentOutOfRangeException)
-                            {
-                                if (chips[i - temp + chips.Count] > equilibrium)
-                                {
-                                    chips[i - temp + chips.Count] -= 1;
-                                    chips[i] += 1;
-                                    steps += temp;
-                                    i = 0;
-                                    break;
-                                }
-                            }
-                            temp++;
+                            chips[indexmin + temp]--;
+                            chips[indexmin]++;
+                            steps += temp;
+                            break;
                         }
                     }
+                    catch (System.ArgumentOutOfRangeException)
+                    {
+                        if (chips[indexmin + temp - chips.Count] > equilibrium)
+                        {
+                            chips[indexmin + temp - chips.Count]--;
+                            chips[indexmin]++;
+                            steps += temp;
+                            break;
+                        }
+                    }
+                    try
+                    {
+                        if (chips[indexmin - temp] > equilibrium)
+                        {
+                            chips[indexmin - temp]--;
+                            chips[indexmin]++;
+                            steps += temp;
+                            break;
+                        }
+                    }
+                    catch (System.ArgumentOutOfRangeException)
+                    {
+                        if (chips[indexmin - temp + chips.Count] > equilibrium)
+                        {
+                            chips[indexmin - temp + chips.Count]--;
+                            chips[indexmin]++;
+                            steps += temp;
+                            break;
+                        }
+                    }
+                    temp++;
                 }
                 ready = 0;
                 foreach (int i in chips)
                 {
-                    if (i == equilibrium) 
+                    if (i == equilibrium)
                     {
                         ready++;
-                    }                        
+                    }
                 }
-                if ( ready == chips.Count)
+                if (ready == chips.Count)
                 {
+                    a = 1;
                     break;
                 }
-                
             }
             Console.WriteLine("Итоговое распределение:");
             foreach (int i in chips)
             {
-                Console.WriteLine(i);
+                Console.Write(i + " ");
             }
             Console.WriteLine('\n' + "Количество шагов");
             Console.WriteLine(steps);
             Console.ReadKey();
         }
-
     }
 }
